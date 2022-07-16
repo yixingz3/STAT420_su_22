@@ -1,0 +1,35 @@
+---
+title: "Final Project Report"
+author: "STAT 420, Summer 2022, D. Unger - Bryan Settles (brsettl2@illinois.edu), Yixing Zheng (yixingz3@illinois.edu), Yunfei Ouyang (yunfeio2@illinois.edu)"
+date: '2022/07/15'
+output:
+  html_document: 
+    theme: readable
+    toc: yes
+  pdf_document: default
+urlcolor: cyan
+---
+
+## Read file into R
+```{r}
+library(readr)
+library(dplyr)
+housing = read_csv("Housing_price_in_Beijing.csv")
+housing = as.data.frame(housing)
+str(housing)
+
+sum(is.na(housing))
+housing = na.omit(housing)
+sum(is.na(housing))
+
+str(housing)
+
+removed_cols = c("url")
+housing_removed_url = housing[, -which(names(housing) %in% removed_cols)]
+str(housing_url)
+
+housing_2000 = sample_n(housing, 2000)
+str(housing_2000)
+housing_2000_removed_url = housing[, -which(names(housing_2000) %in% removed_cols)]
+str(housing_2000_removed_url)
+```
