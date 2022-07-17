@@ -43,10 +43,3 @@ str(housing)
 head(housing, 10)
 ```
 
-### Proposal Requirement Details - copied from [link](https://d18ky98rnyall9.cloudfront.net/IAZ-yE1WQPWGfshNVoD1SQ_9a94df6ec90a4643aad57503dfa2a4f1_data-project-su22.html?Expires=1657670400&Signature=VMojb1hefG77MgFJs0RoNvLgYMImCXkRnEibC8TN05Rk6Kysbry1S-cXv7aFPneyLSL8CkzbS7mhbLseD6kaT5EZazkB1WuNehHztKeEV4WjZPACug~LoGMtD9x0TJ3rXmtBpNvAbkVIROeLa4-DiYubaihW3RZzdeMF3L11ghs_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A), to be removed
-1. The names of the students who will be contributing to the group project.
-2. A tentative title for the project.
-3. Description of the data file (what they contain including number of variables and number of records). You do not necessarily have to list all the variables, but at least mention those of greatest importance.
-4. Background information on the data sets, including specific citation of their source (so that I can also access it).
-5. A brief statement of the business, science, research, or personal interest you have in the data set which you hope to explore.
-6. Evidence that the data can be loaded into R. Load the data, and print the first few values of the response variable as evidence.
