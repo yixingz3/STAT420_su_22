@@ -19,18 +19,20 @@ urlcolor: cyan
 - Beijing Real Estate Price Prediction using Statistical Modeling
 
 ## Description of the data file:
-- The data file includes the Housing price of Beijing from 2011 to 2017, fetching from Lianjia.com. It includes URL, ID, Lng, Lat, CommunityID, TradeTime, DOM(days on market), Followers, Total price, Price, Square, Living Room, number of Drawing room, Kitchen and Bathroom, Building Type, Construction time. renovation condition, building structure, Ladder ratio( which is the proportion between number of residents on the same floor and number of elevator of ladder. It describes how many ladders a resident have on average), elevator, Property rights for five years（It's related to China restricted purchase of houses policy), Subway, District, Community average price. Most data is traded in 2011-2017, some of them is traded in Jan,2018, and some is even earlier(2010,2009).
+- The data file includes the Housing price of Beijing from 2011 to 2017, fetching from Lianjia.com (similar to Zillow or Redfin). It includes URL, ID, Lng, Lat, CommunityID, TradeTime, DOM (days on market), Followers, Total price, Price, Square, Living Room, Number of Drawing room, Kitchen and Bathroom, Building Type, Construction time, Renovation Condition, Building Structure, Ladder ratio (which is the proportion between number of residents on the same floor and number of elevator of ladder. It describes how many ladders a resident have on average), Elevator, Property Rights For Five Fears（It's related to China restricted purchase of houses policy), Subway, District, Community Average Price. Most data is collected from year 2011 - 2017, some of it is from Jan, 2018, and some is from earlier(2010, 2009).
 All the data was fetching from https://bj.lianjia.com/chengjiao.
 
 ## Background information and source File
-- Background information: TBD
+- Background information: 
+    - After some quick cleaning to remove the invalid values, we are left with 159376 obs. of  26 variables, from which we will select around 10 variables to build our model and test the performance with two splitted data sets - train and test, each might contain 80000 observations (depends on the calculation resources needed, we might reduce the number of observations used in building and testing the model).
+    - One variable we would like to include but requires further data cleaning is `floor` that is composed by a Chinese character indicating the catalog of the height of the building and its total number of floors. For example, `\xb8\xdf 26` should be translated to `tall 26`, which means the building has 26 floors and is categorized as a tall building. Similarly, `\xd6\xd0 4` means a low building with 4 floors in total, and `\xb8\xdf 10` means a medium height building of in total 10 floors.
 - Source file link: [Housing price in Beijing](https://www.kaggle.com/datasets/ruiqurm/lianjia)
 
 ## Statement of interest
-- Real estate price prediction is attractive for both holders and traders. It is an interesting topic since many factors can inflate the house price in Beijing For example, We want to investigate how housing prices in Beijing are related to the growth of its economy. We will construct several statistical models to predict the data on Beijing's house prices. Specifically, we will utilize multiple linear regression, categorical predictors, transformations and model building using AIC, and BIC. We then will use model selection tools and model diagnostic methods to decide which model is the best model for predicting house prices. Last we will do a deep analysis of the best model to see its performance.
+- Real estate price prediction is attractive for both holders and traders. It is an interesting topic since many factors can inflate the house price in Beijing. For example, we want to investigate how housing prices in Beijing are related to the growth of its economy. We will construct several statistical models to predict the data on Beijing's house prices. Specifically, we will utilize multiple linear regression, categorical predictors, transformations and model building using AIC, and BIC. We then will use model selection tools and model diagnostic methods to decide which model is the best model for predicting house prices. Finally, we will do a deep analysis of the best model to see its performance.
 
 ## Loading source data into R
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(readr)
 housing = read_csv("Housing_price_in_Beijing.csv")
 housing = as.data.frame(housing)

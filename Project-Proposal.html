@@ -382,18 +382,17 @@ pre code {
 
 <div id="TOC">
 <ul>
-<li><a href="#project-members" id="toc-project-members">Project
-members</a></li>
-<li><a href="#tentative-title-for-the-project" id="toc-tentative-title-for-the-project">Tentative title for the
+<li><a href="#project-members">Project members</a></li>
+<li><a href="#tentative-title-for-the-project">Tentative title for the
 project:</a></li>
-<li><a href="#description-of-the-data-file" id="toc-description-of-the-data-file">Description of the data
+<li><a href="#description-of-the-data-file">Description of the data
 file:</a></li>
-<li><a href="#background-information-and-source-file" id="toc-background-information-and-source-file">Background information
-and source File</a></li>
-<li><a href="#statement-of-interest" id="toc-statement-of-interest">Statement of interest</a></li>
-<li><a href="#loading-source-data-into-r" id="toc-loading-source-data-into-r">Loading source data into R</a>
+<li><a href="#background-information-and-source-file">Background
+information and source File</a></li>
+<li><a href="#statement-of-interest">Statement of interest</a></li>
+<li><a href="#loading-source-data-into-r">Loading source data into R</a>
 <ul>
-<li><a href="#proposal-requirement-details---copied-from-link-to-be-removed" id="toc-proposal-requirement-details---copied-from-link-to-be-removed">Proposal
+<li><a href="#proposal-requirement-details---copied-from-link-to-be-removed">Proposal
 Requirement Details - copied from <span>link</span>, to be
 removed</a></li>
 </ul></li>
@@ -418,23 +417,41 @@ removed</a></li>
 <h2>Description of the data file:</h2>
 <ul>
 <li>The data file includes the Housing price of Beijing from 2011 to
-2017, fetching from Lianjia.com. It includes URL, ID, Lng, Lat,
-CommunityID, TradeTime, DOM(days on market), Followers, Total price,
-Price, Square, Living Room, number of Drawing room, Kitchen and
-Bathroom, Building Type, Construction time. renovation condition,
-building structure, Ladder ratio( which is the proportion between number
-of residents on the same floor and number of elevator of ladder. It
-describes how many ladders a resident have on average), elevator,
-Property rights for five years（It’s related to China restricted
-purchase of houses policy), Subway, District, Community average price.
-Most data is traded in 2011-2017, some of them is traded in Jan,2018,
-and some is even earlier(2010,2009). All the data was fetching from <a href="https://bj.lianjia.com/chengjiao" class="uri">https://bj.lianjia.com/chengjiao</a>.</li>
+2017, fetching from Lianjia.com (similar to Zillow or Redfin). It
+includes URL, ID, Lng, Lat, CommunityID, TradeTime, DOM (days on
+market), Followers, Total price, Price, Square, Living Room, Number of
+Drawing room, Kitchen and Bathroom, Building Type, Construction time,
+Renovation Condition, Building Structure, Ladder ratio (which is the
+proportion between number of residents on the same floor and number of
+elevator of ladder. It describes how many ladders a resident have on
+average), Elevator, Property Rights For Five Fears（It’s related to
+China restricted purchase of houses policy), Subway, District, Community
+Average Price. Most data is collected from year 2011 - 2017, some of it
+is from Jan, 2018, and some is from earlier(2010, 2009). All the data
+was fetching from <a href="https://bj.lianjia.com/chengjiao" class="uri">https://bj.lianjia.com/chengjiao</a>.</li>
 </ul>
 </div>
 <div id="background-information-and-source-file" class="section level2">
 <h2>Background information and source File</h2>
 <ul>
-<li>Background information: TBD</li>
+<li>Background information:
+<ul>
+<li>After some quick cleaning to remove the invalid values, we are left
+with 159376 obs. of 26 variables, from which we will select around 10
+variables to build our model and test the performance with two splitted
+data sets - train and test, each might contain 80000 observations
+(depends on the calculation resources needed, we might reduce the number
+of observations used in building and testing the model).</li>
+<li>One variable we would like to include but requires further data
+cleaning is <code>floor</code> that is composed by a Chinese character
+indicating the catalog of the height of the building and its total
+number of floors. For example, <code>\xb8\xdf 26</code> should be
+translated to <code>tall 26</code>, which means the building has 26
+floors and is categorized as a tall building. Similarly,
+<code>\xd6\xd0 4</code> means a low building with 4 floors in total, and
+<code>\xb8\xdf 10</code> means a medium height building of in total 10
+floors.</li>
+</ul></li>
 <li>Source file link: <a href="https://www.kaggle.com/datasets/ruiqurm/lianjia">Housing price in
 Beijing</a></li>
 </ul>
@@ -444,32 +461,22 @@ Beijing</a></li>
 <ul>
 <li>Real estate price prediction is attractive for both holders and
 traders. It is an interesting topic since many factors can inflate the
-house price in Beijing For example, We want to investigate how housing
+house price in Beijing. For example, we want to investigate how housing
 prices in Beijing are related to the growth of its economy. We will
 construct several statistical models to predict the data on Beijing’s
 house prices. Specifically, we will utilize multiple linear regression,
 categorical predictors, transformations and model building using AIC,
 and BIC. We then will use model selection tools and model diagnostic
 methods to decide which model is the best model for predicting house
-prices. Last we will do a deep analysis of the best model to see its
+prices. Finally, we will do a deep analysis of the best model to see its
 performance.</li>
 </ul>
 </div>
 <div id="loading-source-data-into-r" class="section level2">
 <h2>Loading source data into R</h2>
 <pre class="r"><code>library(readr)
-housing = read_csv(&quot;Housing_price_in_Beijing.csv&quot;)</code></pre>
-<pre><code>## Warning: One or more parsing issues, see `problems()` for details</code></pre>
-<pre><code>## Rows: 318851 Columns: 26
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (4): url, id, floor, constructionTime
-## dbl  (21): Lng, Lat, Cid, DOM, followers, totalPrice, price, square, livingR...
-## date  (1): tradeTime
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>housing = as.data.frame(housing)
+housing = read_csv(&quot;Housing_price_in_Beijing.csv&quot;)
+housing = as.data.frame(housing)
 housing = na.omit(housing)
 
 str(housing)</code></pre>
