@@ -16,17 +16,18 @@ urlcolor: cyan
 - Yunfei Ouyang (yunfeio2@illinois.edu)
 
 ## Tentative title for the project:
-- TBD
+- Beijing Real Estate Price Prediction using Statistical Modeling
 
 ## Description of the data file:
-- TBD
+- The data file includes the Housing price of Beijing from 2011 to 2017, fetching from Lianjia.com. It includes URL, ID, Lng, Lat, CommunityID, TradeTime, DOM(days on market), Followers, Total price, Price, Square, Living Room, number of Drawing room, Kitchen and Bathroom, Building Type, Construction time. renovation condition, building structure, Ladder ratio( which is the proportion between number of residents on the same floor and number of elevator of ladder. It describes how many ladders a resident have on average), elevator, Property rights for five years（It's related to China restricted purchase of houses policy), Subway, District, Community average price. Most data is traded in 2011-2017, some of them is traded in Jan,2018, and some is even earlier(2010,2009).
+All the data was fetching from https://bj.lianjia.com/chengjiao.
 
 ## Background information and source File
 - Background information: TBD
 - Source file link: [Housing price in Beijing](https://www.kaggle.com/datasets/ruiqurm/lianjia)
 
 ## Statement of interest
-- TBD
+- Real estate price prediction is attractive for both holders and traders. It is an interesting topic since many factors can inflate the house price in Beijing For example, We want to investigate how housing prices in Beijing are related to the growth of its economy. We will construct several statistical models to predict the data on Beijing's house prices. Specifically, we will utilize multiple linear regression, categorical predictors, transformations and model building using AIC, and BIC. We then will use model selection tools and model diagnostic methods to decide which model is the best model for predicting house prices. Last we will do a deep analysis of the best model to see its performance.
 
 ## Loading source data into R
 ```{r}
