@@ -42,7 +42,7 @@ The final goal of the project is to find a model that best predicts the housing 
 
 # Methods
 ## 1. Setup
-### Import Libraries 
+### Import libraries 
 ```{r message=FALSE, warning=FALSE}
 library(readr)
 library(dplyr)
