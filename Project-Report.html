@@ -383,71 +383,74 @@ Statistical Modeling</h1>
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a>
 <ul>
-<li><a href="#beijing-real-estate-price-prediction-using-statistical-modeling">Beijing
+<li><a href="#beijing-real-estate-price-prediction-using-statistical-modeling" id="toc-beijing-real-estate-price-prediction-using-statistical-modeling">Beijing
 Real Estate Price Prediction using Statistical Modeling</a></li>
-<li><a href="#description-of-the-data-file">Description of the data
+<li><a href="#description-of-the-data-file" id="toc-description-of-the-data-file">Description of the data
 file</a></li>
-<li><a href="#background-information-and-source-file">Background
-information and source File</a></li>
-<li><a href="#statement-of-interest">Statement of interest</a></li>
-<li><a href="#goal-of-the-project">Goal of the project</a></li>
+<li><a href="#background-information-and-source-file" id="toc-background-information-and-source-file">Background information
+and source File</a></li>
+<li><a href="#statement-of-interest" id="toc-statement-of-interest">Statement of interest</a></li>
+<li><a href="#goal-of-the-project" id="toc-goal-of-the-project">Goal of
+the project</a></li>
 </ul></li>
-<li><a href="#methods">Methods</a>
+<li><a href="#methods" id="toc-methods">Methods</a>
 <ul>
-<li><a href="#setup">1. Setup</a>
+<li><a href="#setup" id="toc-setup">1. Setup</a>
 <ul>
-<li><a href="#import-libraries">Import libraries</a></li>
-<li><a href="#set-seed">Set seed</a></li>
-<li><a href="#read-file-into-r">Read file into R</a></li>
-<li><a href="#clean-up-na-and-unused-variables">Clean up N/A and unused
+<li><a href="#import-libraries" id="toc-import-libraries">Import
+libraries</a></li>
+<li><a href="#set-seed" id="toc-set-seed">Set seed</a></li>
+<li><a href="#read-file-into-r" id="toc-read-file-into-r">Read file into
+R</a></li>
+<li><a href="#clean-up-na-and-unused-variables" id="toc-clean-up-na-and-unused-variables">Clean up N/A and unused
 variables</a></li>
-<li><a href="#remove-variables-based-on-correlation">Remove variables
-based on correlation</a></li>
-<li><a href="#remove-variables-based-on-multicollinearity">Remove
-variables based on multicollinearity</a></li>
-<li><a href="#description-of-currently-available-variables">Description
-of currently available variables</a></li>
+<li><a href="#remove-variables-based-on-correlation" id="toc-remove-variables-based-on-correlation">Remove variables based on
+correlation</a></li>
+<li><a href="#remove-variables-based-on-multicollinearity" id="toc-remove-variables-based-on-multicollinearity">Remove variables
+based on multicollinearity</a></li>
+<li><a href="#description-of-currently-available-variables" id="toc-description-of-currently-available-variables">Description of
+currently available variables</a></li>
 </ul></li>
-<li><a href="#split-data">2. Split data</a>
+<li><a href="#split-data" id="toc-split-data">2. Split data</a>
 <ul>
-<li><a href="#split-dataset---largefull-and-small-for-quick-analyses-runtime">Split
+<li><a href="#split-dataset---largefull-and-small-for-quick-analyses-runtime" id="toc-split-dataset---largefull-and-small-for-quick-analyses-runtime">Split
 dataset - large/full and small for quick analyses runtime</a></li>
-<li><a href="#split-dataset---train-validation-and-test">Split dataset -
+<li><a href="#split-dataset---train-validation-and-test" id="toc-split-dataset---train-validation-and-test">Split dataset -
 train, validation, and test</a></li>
 </ul></li>
-<li><a href="#model-analyses">3. Model analyses</a>
+<li><a href="#model-analyses" id="toc-model-analyses">3. Model
+analyses</a>
 <ul>
-<li><a href="#build-model---simple-additive-interative">Build model -
-simple, additive, interative</a></li>
-<li><a href="#anova-on-above-models">Anova on above models</a></li>
-<li><a href="#transformation-logy-polynomio">transformation? log(y),
+<li><a href="#build-model---simple-additive-interative" id="toc-build-model---simple-additive-interative">Build model - simple,
+additive, interative</a></li>
+<li><a href="#anova-on-above-models" id="toc-anova-on-above-models">Anova on above models</a></li>
+<li><a href="#transformation-logy-polynomio" id="toc-transformation-logy-polynomio">transformation? log(y),
 polynomio</a></li>
-<li><a href="#search-func---both-direction-with-aic-and-bic">Search func
-- both direction with AIC and BIC</a></li>
-<li><a href="#anova-again-on-the-above-selected-models">Anova again on
-the above selected models</a></li>
-<li><a href="#any-specific-interesting-variable-we-want-to-addremove">Any
+<li><a href="#search-func---both-direction-with-aic-and-bic" id="toc-search-func---both-direction-with-aic-and-bic">Search func -
+both direction with AIC and BIC</a></li>
+<li><a href="#anova-again-on-the-above-selected-models" id="toc-anova-again-on-the-above-selected-models">Anova again on the
+above selected models</a></li>
+<li><a href="#any-specific-interesting-variable-we-want-to-addremove" id="toc-any-specific-interesting-variable-we-want-to-addremove">Any
 specific interesting variable we want to add/remove?</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#results">Results</a>
+<li><a href="#results" id="toc-results">Results</a>
 <ul>
-<li><a href="#predict-house-pricing-use-best-model-selected">Predict
-house pricing use best model selected</a></li>
-<li><a href="#plot-best-model-selected">Plot best model
-selected</a></li>
+<li><a href="#predict-house-pricing-use-best-model-selected" id="toc-predict-house-pricing-use-best-model-selected">Predict house
+pricing use best model selected</a></li>
+<li><a href="#plot-best-model-selected" id="toc-plot-best-model-selected">Plot best model selected</a></li>
 </ul></li>
-<li><a href="#discussion">Discussion</a>
+<li><a href="#discussion" id="toc-discussion">Discussion</a>
 <ul>
-<li><a href="#how-do-we-decide-which-model-is-the-best">How do we decide
-which model is the best?</a></li>
+<li><a href="#how-do-we-decide-which-model-is-the-best" id="toc-how-do-we-decide-which-model-is-the-best">How do we decide which
+model is the best?</a></li>
 </ul></li>
-<li><a href="#appendix">Appendix</a>
+<li><a href="#appendix" id="toc-appendix">Appendix</a>
 <ul>
-<li><a href="#team-members">Team Members</a></li>
-<li><a href="#misc.">Misc.</a></li>
+<li><a href="#team-members" id="toc-team-members">Team Members</a></li>
+<li><a href="#misc." id="toc-misc.">Misc.</a></li>
 </ul></li>
 </ul>
 </div>

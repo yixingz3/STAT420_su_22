@@ -1,0 +1,282 @@
+---
+title: "Beijing Real Estate Price Prediction using Statistical Modeling"
+author: "STAT 420, Summer 2022, D. Unger"
+date: '2022/07/31'
+output:
+  html_document: 
+    theme: readable
+    toc: yes
+  pdf_document: default
+urlcolor: cyan
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+options(scipen = 1, digits = 4, width = 80, fig.align = "center")
+```
+
+```{r}
+# NOTE - to be removed before submission
+# one way to fail is NO EXPLORATION - staying with one way from beginning to finish
+# we don't want to do this because the goal of the project is to explore the data and see what we can get from it. at the end, we definitely need a couple of different options balancing many factors (error rate, model simplicity, and so on).
+```
+
+# Introduction
+## Beijing Real Estate Price Prediction using Statistical Modeling
+
+## Description of the data file
+The data file includes the Housing price of Beijing from 2011 to 2017, fetching from Lianjia.com (similar to Zillow or Redfin). It includes URL, ID, Lng, Lat, CommunityID, TradeTime, DOM (days on market), Followers, Total price, Price, Square, Living Room, Number of Drawing room, Kitchen and Bathroom, Building Type, Construction time, Renovation Condition, Building Structure, Ladder ratio (which is the proportion between number of residents on the same floor and number of elevator. It describes how many elevators a resident have on average), Elevator, Property Rights For Five Fears (It's related to China restricted purchase of houses policy), Subway, District, Community Average Price. Most data is collected from year 2011 - 2017, some of it is from Jan, 2018, and some is from earlier(2010, 2009).
+All the data was fetching from https://bj.lianjia.com/chengjiao.
+
+## Background information and source File
+Background information: 
+
+After some quick cleaning to remove the invalid values, we are left with 159376 obs. of  26 variables, from which we will select around 10 variables to build our model and test the performance with two splitted data sets - train and test, each might contain 80000 observations (depends on the calculation resources needed, we might reduce the number of observations used in building and testing the model).
+
+Source file link: [Housing price in Beijing](https://www.kaggle.com/datasets/ruiqurm/lianjia)
+
+## Statement of interest
+Real estate price prediction is attractive for both holders and traders. It is an interesting topic since many factors can inflate the house price in Beijing. For example, we want to investigate how housing prices in Beijing are related to the growth of its economy. We will construct several statistical models to predict the data on Beijing's house prices. Specifically, we will utilize multiple linear regression, categorical predictors, transformations and model building using AIC, and BIC. We then will use model selection tools and model diagnostic methods to decide which model is the best model for predicting house prices. Finally, we will do a deep analysis of the best model to see its performance.
+
+## Goal of the project
+The final goal of the project is to find a model that best predicts the housing prices in Beijing for the future with the balance of error rate, complicity, and comprehensibility.
+
+# Methods
+## 1. Setup
+### Import libraries 
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(faraway)
+```
+
+### Set seed
+```{r}
+set.seed(120)
+```
+
+### Read file into R
+```{r warning=FALSE}
+housing = read_csv("Housing_price_in_Beijing.csv")
+housing = as.data.frame(housing)
+str(housing)
+head(housing, 5)
+```
+
+### Clean up N/A and unused variables
+```{r, warning = FALSE}
+# Remove N/A values
+sum(is.na(housing))
+housing$constructionTime = as.numeric(housing$constructionTime)
+housing$floor = as.numeric(sapply(housing$floor, function(x) strsplit(x,' ')[[1]][2]))
+
+housing = na.omit(housing)
+sum(is.na(housing))
+
+housing$tradeTime = as.numeric(as.POSIXct(housing$tradeTime, format = "%Y-%m-%d"))
+
+# Remove irrelevant cols
+# Since our goal is to predict the future house pricing,
+# we are not interested in the technical side related to the website structure
+# so remove the url as well as the id and followers of the listing
+remove_cols = c("url", "id", "followers")
+housing_cols_removed = housing[, -which(names(housing) %in% remove_cols)]
+str(housing_cols_removed)
+```
+### Remove variables based on correlation
+```{r}
+# only consider the numeric values for correlation analysis
+housing_cols_removed_numeric = housing_cols_removed[ , unlist(lapply(housing_cols_removed, is.numeric))]
+
+hoursing_cor_res = cor(housing_cols_removed_numeric)
+
+mean_housing_cor_res_beside_diag = mean(hoursing_cor_res[hoursing_cor_res != 1])
+
+head(hoursing_cor_res, 5)
+```
+**The mean correlation result for the current housing dataset is `r mean_housing_cor_res_beside_diag` and since the values are relatively low, we decide not to further modify the variables based on it.**
+
+### Remove variables based on multicollinearity 
+```{r}
+# Build an additive model to conduct the variance inflation factors analysis
+housing_add_full = lm(price ~ ., housing_cols_removed_numeric)
+vif(housing_add_full)
+max_housing_add_full_vif = max(vif(housing_add_full))
+```
+
+**We only have one var - square that has a VIF sightly over 5 as `r max_housing_add_full_vif`, but as it's not significant, so we decide not to remove it from the list of variables.**
+
+### Description of currently available variables
+-**`Lng`: and `Lat` coordinates, using the BD09 protocol.**
+
+-**`Cid`: the community id.**
+
+-**`tradeTime`: the time of transaction.**
+
+-**`DOM`: the active days on market.**
+
+-**`totalPrice`: the total price of the listing**
+
+-**`price`: the average price by square.**
+
+-**`square`: the square of the house.**
+
+-**`livingRoom`: the number of bedroom (updated based on the comment of the source).**
+
+-**`drawingRoom`: the number of living room (updated based on the comment of the source).**
+
+-**`kitchen`: the number of kitchen.**
+
+-**`bathroom`: the number of bathroom.**
+
+-**`floor`: the height of the house, in number of floors.**
+
+-**`buildingType`: including tower(1), bungalow(2)，combination of plate and tower(3), plate(4).**
+
+-**`constructionTime`: the time of construction.**
+
+-**`renovationCondition`: including other(1), rough(2), Simplicity(3), hardcover(4).**
+
+-**`buildingStructure`: including unknow(1), mixed(2), brick and wood(3), brick and concrete(4), steel(5), and steel-concrete composite (6).**
+
+-**`ladderRatio`: the proportion between number of residents on the same floor and number of elevator. It describes on average how many households are sharing the elevator. For example, the value would be 1 if there is only 1 household on the floor is using the elevator. And the value would be 6 if on the same floor, 6 different households/apartments are sharing the same elevator.**
+
+-**`elevator`: have (1) or not have elevator(0).**
+
+-**`fiveYearsProperty`: if the owner have the property for less than 5 years, similar to the 2 years rule in the US. If the the property is not owned for at least 5 years, the transaction will involve a higher tax payment.**
+
+## 2. Split data
+### Split dataset - large/full and small for quick analyses runtime
+```{r}
+# Get a subset of 2000 obs since the full dataset has ~ 160,000 obs
+# for running analyses quickly
+housing_2000 = sample_n(housing_cols_removed, 2000)
+nrow(housing_2000)
+
+# Remove the 2000 sampled obs from the full dataset
+housing_full = housing_cols_removed %>% anti_join(housing_2000)
+nrow(housing_full)
+
+# TODO - this one is low, uncomment when everything is finished
+# isTRUE(housing_2000 %in% housing_full)
+all.equal((nrow(housing_2000) + nrow(housing_full)), nrow(housing))
+```
+
+### Split dataset - train, validation, and test
+```{r}
+# The ratio we picked for train, validation, and test is 60-20-20
+# First we sample the data for the small dataset
+housing_2000_sample_size = nrow(housing_2000)
+set_proportions = c(Training = 0.6, Validation = 0.2, Test = 0.2)
+set_frequencies = diff(floor(housing_2000_sample_size * cumsum(c(0, set_proportions))))
+housing_2000$set = sample(rep(names(set_proportions), times = set_frequencies))
+
+housing_2000_tr = housing_2000[housing_2000$set == "Training", ]
+housing_2000_va = housing_2000[housing_2000$set == "Validation", ]
+housing_2000_te = housing_2000[housing_2000$set == "Test", ]
+
+# Remove unused `set` var after dataset split
+housing_2000_tr = subset(housing_2000_tr, select=-c(set))
+housing_2000_va = subset(housing_2000_va, select=-c(set))
+housing_2000_te = subset(housing_2000_te, select=-c(set))
+```
+
+```{r}
+# Then we sample the data for the large dataset
+housing_full_sample_size = nrow(housing_full)
+set_proportions = c(Training = 0.6, Validation = 0.2, Test = 0.2)
+set_frequencies = diff(floor(housing_full_sample_size * cumsum(c(0, set_proportions))))
+housing_full$set = sample(rep(names(set_proportions), times = set_frequencies))
+
+housing_full_tr = housing_full[housing_full$set == "Training", ]
+housing_full_va = housing_full[housing_full$set == "Validation", ]
+housing_full_te = housing_full[housing_full$set == "Test", ]
+
+# Remove unused `set` var after dataset split
+housing_full_tr = subset(housing_full_tr, select=-c(set))
+housing_full_va = subset(housing_full_va, select=-c(set))
+housing_full_te = subset(housing_full_te, select=-c(set))
+```
+
+## 3. Model analyses
+### Build model - simple, additive, interative
+```{r}
+View(housing_2000_tr)
+```
+
+
+### Anova on above models
+```{r}
+
+```
+
+```{r}
+# NOTE - to be removed before submission
+# hw9-Q2 might be a good reference for finding the best model
+# with all the loocv_rmse, adj_r2, bp_decision, sw_decision, and num_params as standard for determining whether the model we find is good or not
+
+# maybe box-cox on response and if a predictor is need by looking at scatter plot
+```
+
+### transformation? log(y), polynomio
+```{r}
+
+```
+
+### Search func - both direction with AIC and BIC
+```{r}
+
+```
+
+### Anova again on the above selected models
+```{r}
+
+```
+
+### Any specific interesting variable we want to add/remove?
+```{r}
+
+```
+
+# Results
+```{r}
+# NOTE - to be removed before submission
+# we can have 2 - 3 models for the final competition if there isn't a clear winner
+# for the obvious under performed models we'll just describe in brief sentences and a plot showcase why it's not a good model and maybe put them into appendix
+# "we start with this (maybe additive) and run both directions search and end with something (additive_selected)" - this should be the end result, numeric and not a whole catalog
+
+# highlight the result - good or bad that helps us make decision on including it or not
+```
+
+## Predict house pricing use best model selected
+```{r}
+
+```
+
+## Plot best model selected
+```{r}
+
+```
+
+# Discussion
+## How do we decide which model is the best?
+```{r}
+# NOTE - to be removed before submission
+# could have a table of best candidate models with all the analyses values of these models
+# do they meet all 3 assumptions?
+
+# How is your final model useful?
+```
+
+# Appendix
+
+## Team Members
+- Bryan Settles (brsettl2@illinois.edu)
+- Yixing Zheng (yixingz3@illinois.edu)
+- Yunfei Ouyang (yunfeio2@illinois.edu)
+
+## Misc.
+```{r}
+
+```
+
+
