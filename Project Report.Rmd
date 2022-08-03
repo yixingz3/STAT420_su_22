@@ -1,6 +1,6 @@
 ---
 title: "Beijing Real Estate Price Prediction using Statistical Modeling"
-author: "STAT 420, Summer 2022, D. Unger"
+author: "STAT 420, Summer 2022, B. Settles, Y. Ouyang, Y. Zheng"
 date: '2022/07/31'
 output:
   html_document: 
@@ -12,12 +12,6 @@ urlcolor: cyan
 
 ```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
 options(scipen = 1, digits = 4, width = 80, fig.align = "center")
-```
-
-```{r}
-# NOTE - to be removed before submission
-# one way to fail is NO EXPLORATION - staying with one way from beginning to finish
-# we don't want to do this because the goal of the project is to explore the data and see what we can get from it. at the end, we definitely need a couple of different options balancing many factors (error rate, model simplicity, and so on).
 ```
 
 # Introduction
@@ -121,7 +115,7 @@ max_housing_add_full_vif = max(vif(housing_add_full))
 
 -**`kitchen`: the number of kitchen.**
 
--**`bathroom`: the number of bathroom.**
+-**`bathRoom`: the number of bathroom.**
 
 -**`floor`: the height of the house, in number of floors.**
 
@@ -195,15 +189,190 @@ housing_full_te = subset(housing_full_te, select=-c(set))
 ## 3. Model analyses
 ### Build model - simple, additive, interative
 ```{r}
+hist(housing_2000_tr$Lng, breaks = 20, main = "Lng", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$Lat, breaks = 20, main = "Lat", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$totalPrice, breaks = 20, main = "totalPrice", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$price, breaks = 20, main = "price (per square ft)", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$square, breaks = 20, main = "square feet", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$livingRoom, breaks = 20, main = "livingRooms", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$drawingRoom, breaks = 20, main = "drawingRooms", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$kitchen, breaks = 20, main = "kitchens", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$bathRoom, breaks = 20, main = "bathRooms", border="yellow", col="dodgerblue")
+#hist(housing_2000_tr$floor, breaks = 20, main = "floors", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$buildingType, breaks = 20, main = "buildingType", border="yellow", col="dodgerblue")
+#hist(housing_2000_tr$constructionTime, breaks = 20, main = "constructionTime", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$renovationCondition, breaks = 20, main = "renovationCondition", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$buildingStructure, breaks = 20, main = "buildingStructure", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$ladderRatio, breaks = 20, main = "ladderRatio", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$elevator, breaks = 20, main = "elevator", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$fiveYearsProperty, breaks = 20, main = "fiveYearsProperty", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$subway, breaks = 20, main = "subway", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$district, breaks = 20, main = "district", border="yellow", col="dodgerblue")
+hist(housing_2000_tr$communityAverage, breaks = 20, main = "communityAverage", border="yellow", col="dodgerblue")
+
+
+library(faraway)
+library(lmtest)
+
+area_mod = lm(square ~ livingRoom + drawingRoom + bathRoom + kitchen, data = housing_2000_tr)
+summary(area_mod)$r.squared
+
+log_mod = lm(log(price) ~ . + I(square ^ 2) + I(ladderRatio ^ 2) + I(buildingStructure ^ 2) + I(buildingType) + log(buildingStructure) + log(buildingType), data = housing_2000_tr)
+big_mod = lm(price ~ . + I(square ^ 2) + I(ladderRatio ^ 2) + I(buildingStructure ^ 2) + I(buildingType) + log(buildingStructure) + log(buildingType), data = housing_2000_tr)
+
+model_add = lm(price ~ ., data = housing_2000_tr)
+summary(model_add)$adj.r.squared
+
+aic_add_mod = step(model_add, direction = "backward", trace = 0)
+house_data_aic_add = housing_2000_tr[-which(cooks.distance(aic_add_mod) > 4 / length(cooks.distance(aic_add_mod))),]
+aic_add_mod = lm(formula = aic_add_mod, data = house_data_aic_add)
+
+bic_add_mod = step(model_add, direction = "backward", k = log(length(resid(model_add))), trace = 0)
+house_data_bic_add = housing_2000_tr[-which(cooks.distance(bic_add_mod) > 4 / length(cooks.distance(bic_add_mod))),]
+bic_add_mod = lm(formula = bic_add_mod, data = house_data_bic_add)
+
+aic_big_mod = step(big_mod, direction = "backward", trace = 0)
+house_data_aic_big = housing_2000_tr[-which(cooks.distance(aic_big_mod) > 4 / length(cooks.distance(aic_big_mod))),]
+aic_big_mod = lm(formula = aic_big_mod, data = house_data_aic_big)
+
+bic_big_mod = step(big_mod, direction = "backward", k = log(length(resid(model_add))), trace = 0)
+house_data_bic_big = housing_2000_tr[-which(cooks.distance(bic_big_mod) > 4 / length(cooks.distance(bic_big_mod))),]
+bic_big_mod = lm(formula = bic_big_mod, data = house_data_bic_big)
+
+aic_log_mod = step(log_mod, direction = "backward", trace = 0)
+house_data_aic_log = housing_2000_tr[-which(cooks.distance(aic_log_mod) > 4 / length(cooks.distance(aic_log_mod))),]
+aic_log_mod = lm(formula = aic_log_mod, data = house_data_aic_log)
+
+bic_log_mod = step(log_mod, direction = "backward", k = log(length(resid(model_add))), trace = 0)
+house_data_bic_log = housing_2000_tr[-which(cooks.distance(bic_log_mod) > 4 / length(cooks.distance(bic_log_mod))),]
+bic_log_mod = lm(formula = bic_log_mod, data = house_data_bic_log)
+
+get_sw_decision = function(model, alpha = 0.05){
+  decide = unname(shapiro.test(resid(model))$p.value < alpha)
+  ifelse(decide, "Reject", "Fail to Reject")
+}
+
+get_bp_decision = function(model, alpha = 0.05){
+  decide = unname(bptest(model)$p.value < alpha)
+  ifelse(decide, "Reject", "Fail to Reject")
+}
+
+get_adj_r2 = function(model) {
+  summary(model)$adj.r.squared
+}
+
+get_num_params = function(model) {
+  length(coef(model))
+}
+
+get_big_vif = function(model) {
+  sum(vif(model) > 5)
+}
+
+get_loocv_rmse = function(model) {
+  sqrt(mean((resid(model) / (1 - hatvalues(model))) ^ 2))
+}
+
+knitr::kable(data.frame(sw_decision = c(get_sw_decision(model_add),get_sw_decision(area_mod),get_sw_decision(big_mod),get_sw_decision(log_mod),get_sw_decision(aic_add_mod),
+                                            get_sw_decision(bic_add_mod),
+                                            get_sw_decision(aic_big_mod),
+                                            get_sw_decision(bic_big_mod),
+                                            get_sw_decision(aic_log_mod),
+                                            get_sw_decision(bic_log_mod)),
+                            bp_decision = c(get_bp_decision(model_add),get_bp_decision(area_mod),get_bp_decision(big_mod),get_bp_decision(log_mod),get_bp_decision(aic_add_mod),
+                                            get_bp_decision(bic_add_mod),
+                                            get_bp_decision(aic_big_mod),
+                                            get_bp_decision(bic_big_mod),
+                                            get_sw_decision(aic_log_mod),
+                                            get_sw_decision(bic_log_mod)),
+                            loocv_rmse = c(get_loocv_rmse(model_add),get_loocv_rmse(area_mod),get_loocv_rmse(big_mod),get_loocv_rmse(log_mod),get_loocv_rmse(aic_add_mod),
+                                           get_loocv_rmse(bic_add_mod),
+                                           get_loocv_rmse(aic_big_mod),
+                                           get_loocv_rmse(bic_big_mod),
+                                           get_loocv_rmse(aic_log_mod),
+                                           get_loocv_rmse(bic_log_mod)),
+                            adj_r2 = c(get_adj_r2(model_add),get_adj_r2(area_mod),get_adj_r2(big_mod),get_adj_r2(log_mod),get_adj_r2(aic_add_mod),
+                                       get_adj_r2(bic_add_mod),
+                                       get_adj_r2(aic_big_mod),
+                                       get_adj_r2(bic_big_mod),
+                                       get_adj_r2(aic_log_mod),
+                                       get_adj_r2(bic_log_mod)),
+                            num_params = c(get_num_params(model_add),get_num_params(area_mod),get_num_params(big_mod),get_num_params(log_mod),get_num_params(aic_add_mod),
+                                           get_num_params(bic_add_mod),
+                                           get_num_params(aic_big_mod),
+                                           get_num_params(bic_big_mod),
+                                           get_num_params(aic_log_mod),
+                                           get_num_params(bic_log_mod)),
+                            big_vif = c(get_big_vif(model_add),get_big_vif(area_mod),get_big_vif(big_mod),get_big_vif(log_mod),get_big_vif(aic_add_mod),
+                                        get_big_vif(bic_add_mod),
+                                        get_big_vif(aic_big_mod),
+                                        get_big_vif(bic_big_mod),
+                                        get_big_vif(aic_log_mod),
+                                        get_big_vif(bic_log_mod)),
+                            row.names = c("model_add","area_mod","big_mod","log_mod","aic_add_mod", 
+                                          "bic_add_mod", 
+                                          "aic_big_mod", 
+                                          "bic_big_mod",
+                                          "aic_log_mod",
+                                          "bic_log_mod")))
 
 ```
 
 ### Anova on above models
 ```{r}
+analysis = function(model) {
+        par(mfrow = c(1, 3))
+        plot(fitted(model),resid(model),pch = 16,xlab = "Fitted",ylab = "Residuals",main = "Fitted vs Residuals",col = "yellow")
+        abline(h = 0, lwd = 2, col = "blue")
+        qqnorm(resid(model),pch = 16,main = "QQNorm",col = "yellow")
+        qqline(resid(model),lwd = 2,col = "blue")
+        hist(resid(model),main = "Residuals Histogram",col = "yellow",xlab = "Residuals",ylab = "Frequency")
+        mod_ks_test = ks.test(resid(model),y='pnorm')
+        mod_bp_test = bptest(model)
+
+        knitr::kable(t(data.frame(
+          "Kolmogorov-Smirnov  Test" =
+            c("Test Statistic" = round(mod_ks_test$statistic, 5),
+              "P-Value" = mod_ks_test$p.value,
+              "Result" = ifelse(mod_ks_test$p.value < .05, "Reject", "Fail To Reject")),
+          "Breusch-Pagan Test" =
+            c("Test Statistic" = round(mod_bp_test$statistic, 5),
+              "P-Value" = mod_bp_test$p.value,
+              "Result" = ifelse(mod_bp_test$p.value < .05, "Reject", "Fail To Reject")))), col.names = c("Test Statistic", "P-Value", "Decision"))
+
+}
+analysis(model_add)
+analysis(area_mod)
+analysis(big_mod)
+analysis(log_mod)
+analysis(aic_add_mod)
+analysis(bic_add_mod)
+analysis(aic_big_mod)
+analysis(bic_big_mod)
+analysis(aic_log_mod)
+analysis(bic_log_mod)
+
 
 ```
 
 ```{r}
+new_add_model =  lm(price ~ ., data = housing_2000_tr, subset = cooks.distance(model_add) <= (4 / nrow(housing_2000_tr)))
+new_add_model_AIC = step(new_add_model, direction = "backward", trace = 0)
+
+knitr::kable(data.frame(sw_decision = c(get_sw_decision(new_add_model),get_sw_decision(new_add_model_AIC)),
+                            bp_decision = c(get_bp_decision(new_add_model),get_bp_decision(new_add_model_AIC)),
+                            loocv_rmse = c(get_loocv_rmse(new_add_model),get_loocv_rmse(new_add_model_AIC)),
+                            adj_r2 = c(get_adj_r2(new_add_model),get_adj_r2(new_add_model_AIC)),
+                            num_params = c(get_num_params(new_add_model),get_num_params(new_add_model_AIC)),
+                            big_vif = c(get_big_vif(new_add_model),get_big_vif(new_add_model_AIC)),
+                            row.names = c("new_add_model","new_add_model_AIC")))
+
+analysis(new_add_model)
+analysis(new_add_model_AIC)
+
+
+
+
 # NOTE - to be removed before submission
 # hw9-Q2 might be a good reference for finding the best model
 # with all the loocv_rmse, adj_r2, bp_decision, sw_decision, and num_params as standard for determining whether the model we find is good or not
